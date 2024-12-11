@@ -23,6 +23,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.Version;
 import java.util.List;
 
 @PageTitle("MoveINSA")
@@ -30,6 +31,7 @@ import java.util.List;
 public class VuePrincipale extends VerticalLayout {
 
     public VuePrincipale() {
+        this.add(new H3("Vaadin version : " + Version.getFullVersion()));
         this.add(new H3("Petit programme pour démarrer le projet M3 2024"));
         List<Paragraph> attention = List.of(
                 new Paragraph("Attention : la base de donnée utilisée par défaut "

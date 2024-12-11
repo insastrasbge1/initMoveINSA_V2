@@ -65,6 +65,12 @@ public class GestionBdD {
                     + " nbrplaces int not null,\n"
                     + " proposepar int not null\n"
                     + ")");
+            st.executeUpdate(
+                    "create table etudiant ( \n"
+                    + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ",\n"
+                    + " ine varchar(15) not null unique,\n"
+                    + " nom varchar(50) not null\n"
+                    + ")");
             // création des liens
             st.executeUpdate(
                     """
