@@ -89,6 +89,10 @@ public class Params {
      */
     private List<Double> probasTotPlaceParOffre;
     /**
+     * prefix pour les reférences des offres.*
+     */
+    private String prefixRefOffres;
+    /**
      * Pourcentage d'offre "contraintes" parmis les offres.*
      */
     private double percentOffresContraintes;
@@ -136,6 +140,7 @@ public class Params {
             int minNbrPartenaires, int maxNbrPartenaires,
             List<Double> probasNbrOffres,
             List<Double> probasTotPlaceParOffre,
+            String prefixRefOffres,
             double percentOffresContraintes, double percentOffresLibres,
             String prefixINEEtudiant, String prefixNomEtudiant,
             int nombreDeNomDifferents, List<String> prenomsPossibles,
@@ -147,6 +152,7 @@ public class Params {
         this.maxNbrPartenaires = maxNbrPartenaires;
         this.probasNbrOffres = probasNbrOffres;
         this.probasTotPlaceParOffre = probasTotPlaceParOffre;
+        this.prefixRefOffres = prefixRefOffres;
         this.percentOffresContraintes = percentOffresContraintes;
         this.percentOffresLibres = percentOffresLibres;
         this.prefixINEEtudiant = prefixINEEtudiant;
@@ -154,44 +160,6 @@ public class Params {
         this.nombreDeNomDifferents = nombreDeNomDifferents;
         this.prenomsPossibles = prenomsPossibles;
         this.probasNbrVoeux = probasNbrVoeux;
-    }
-
-    public static Params paramsPetit() {
-        return new Params(
-                List.of("GC", "GE"), // specialites
-                List.of(2,2), // minEffectifsSpe
-                List.of(3,3), // maxEffectifsSpe
-                2, // minNbrPartenaires
-                2, // maxNbrPartenaires
-                List.of(0.0, 1.0), // probasNbrOffres
-                List.of(0.5,0.5), // probasTotPlaceParOffre
-                0.33, // percentOffresContraintes
-                0.33, // percentOffresLibres
-                "INE", // prefixINEEtudiant
-                "Toto", // prefixNomEtudiant
-                200, // nombreDeNomDifferents
-                List.of("Louis", "Noah", "Ava", "Mia"), // prenomsPossibles
-                List.of(0.0,0.33,0.66) // probasNbrVoeux
-        );
-    }
-    
-    public static Params paramsINSA() {
-        return new Params(
-                List.of("GC", "G", "GE", "GT2E", "GM", "MIQ", "PL"), // specialites
-                List.of(100, 20, 40, 40, 60, 40, 20), // minEffectifsSpe
-                List.of(140, 60, 80, 80, 100, 80, 60), // maxEffectifsSpe
-                130, // minNbrPartenaires
-                160, // maxNbrPartenaires
-                List.of(0.05, 0.8, 0.1, 0.05), // probasNbrOffres
-                List.of(0.1, 0.2, 0.2, 0.2, 0.1, 0.1,0.1), // probasTotPlaceParOffre
-                0.33, // percentOffresContraintes
-                0.33, // percentOffresLibres
-                "INE", // prefixINEEtudiant
-                "Toto", // prefixNomEtudiant
-                200, // nombreDeNomDifferents
-                List.of("Louis", "Noah", "Ava", "Mia"), // prenomsPossibles
-                List.of(0.05, 0.2, 0.2, 0.2, 0.2, 0.15) // probasNbrVoeux
-        );
     }
 
     @Override
@@ -202,6 +170,7 @@ public class Params {
                 + "\n  minNbrPartenaires=" + minNbrPartenaires + "\n  maxNbrPartenaires=" + maxNbrPartenaires
                 + "\n  probasNbrOffres=" + probasNbrOffres
                 + "\n  probasTotPlaceParOffre=" + probasTotPlaceParOffre 
+                + "\n  prefixRefOffres=" + prefixRefOffres + "\n"
                 + "\n  percentOffresContrainte=" + percentOffresContraintes + "\n  percentOffresLibres=" + percentOffresLibres
                 + "\n  prefixINEEtudiant=" + prefixINEEtudiant + "\n  prefixNomEtudiant=" + prefixNomEtudiant
                 + "\n  nombreDeNomDifferents=" + nombreDeNomDifferents + "\n  prenomsPossibles=" + prenomsPossibles
@@ -404,6 +373,20 @@ public class Params {
      */
     public void setProbasNbrVoeux(List<Double> probasNbrVoeux) {
         this.probasNbrVoeux = probasNbrVoeux;
+    }
+
+    /**
+     * @return the prefixRefOffres
+     */
+    public String getPrefixRefOffres() {
+        return prefixRefOffres;
+    }
+
+    /**
+     * @param prefixRefOffres the prefixRefOffres to set
+     */
+    public void setPrefixRefOffres(String prefixRefOffres) {
+        this.prefixRefOffres = prefixRefOffres;
     }
 
 }

@@ -18,6 +18,7 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.toto.moveINSA.model.genTest;
 
+import fr.insa.beuvron.utils.divers.Numeroteur;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,25 +33,56 @@ import java.util.stream.Collectors;
  */
 public class Affectation {
 
-    private String ineEtud;
-    private Optional<Integer> numOffre;
+    private TestMobilite situation;
+    private List<AffectUnEtud> affectationEtuds;
 
-    public Affectation(String ineEtud, Optional<Integer> numOffre) {
-        this.ineEtud = ineEtud;
-        this.numOffre = numOffre;
+    private Affectation(TestMobilite situation, List<AffectUnEtud> affectationEtuds) {
+        this.situation = situation;
+        this.affectationEtuds = affectationEtuds;
     }
 
-    @Override
+     @Override
     public String toString() {
-        return "Affectation{" + "ineEtud=" + ineEtud + " --> " 
-                + (numOffre.isEmpty() ? "rien" : numOffre.get()) + '}';
+        return "Affectation{\n"
+                + this.affectationEtuds.stream().map(AffectUnEtud::toString).collect(Collectors.joining("\n"))
+                + "\n}";
     }
 
-    public static List<Affectation> affecte(TestMobilite sit) {
+    private int nombreOfIemeChoix(int numChoix) {
+        return (int) this.affectationEtuds.stream()
+                .filter(ae -> !ae.getRefOffre().isEmpty())
+                .filter(ae -> ae.getEtud().getVoeux().size() > numChoix)
+                .filter(ae -> ae.getEtud().getVoeux().get(numChoix).equals(ae.getRefOffre().get()))
+                .count();
+    }
+    
+    public String toStringAvecStat() {
+        String res = "";
+        int maxChoix = this.situation.getParams().getProbasNbrVoeux().size() - 1;
+        for (int numChoix = 0; numChoix < maxChoix; numChoix++) {
+            res = res + "choix N° " + (numChoix+1) + " obtenu : " + nombreOfIemeChoix(numChoix) + "\n";
+        }
+        long aucunVeux = this.situation.getEtudiants().stream()
+                .filter(e -> e.getVoeux().isEmpty())
+                .count();
+        long nonAffecte = this.affectationEtuds.stream()
+                .filter(ae -> ae.getRefOffre().isEmpty())
+                .count();
+        res = res + "aucun voeux : " + aucunVeux + "\n";
+        res = res + "au moins un voeux mais aucune affectation : " + (nonAffecte - aucunVeux) + "\n";
+        res = res + "-------- detail ---------" + "\n";
+        res = res + this.toString() + "\n";
+        res = res + "\n";
+        return res;
+    }
+
+    public static Affectation affecte(TestMobilite sit) {
         // je construit d'abord des tableaux correspondant aux places libres dans les offres
         int nbrOffre = sit.getOffres().size();
         int nbrSpe = sit.getSpecialites().size();
         int nbrEtud = sit.getEtudiants().size();
+        // pour passer de la ref de l'offre {@code <--> index dans les tableaux}
+        Numeroteur<String> refToIndexOffre = new Numeroteur<>();
         int[] totPlaces = new int[nbrOffre];
         for (int numOffre = 0; numOffre < nbrOffre; numOffre++) {
             totPlaces[numOffre] = sit.getOffres().get(numOffre).getTotPlaces();
@@ -63,55 +95,48 @@ public class Affectation {
         }
         // On prend tous les étudiants triés par score décroissant
         List<EtudGen> etuds = new ArrayList<>(sit.getEtudiants());
-        etuds.sort(Comparator.comparingDouble((etud) -> ((EtudGen)etud).getScore()).reversed());
-        ArrayList<Affectation> res = new ArrayList<>(nbrEtud);
+        etuds.sort(Comparator.comparingDouble((etud) -> ((EtudGen) etud).getScore()).reversed());
+        ArrayList<AffectUnEtud> res = new ArrayList<>(nbrEtud);
         for (EtudGen etud : etuds) {
             int nbrVoeux = etud.getVoeux().size();
             int found = -1;
             int i = 0;
             while (found == -1 && i < nbrVoeux) {
-                int numOffre = etud.getVoeux().get(i);
+                int numOffre = refToIndexOffre.getOrAdd(etud.getVoeux().get(i));
                 int numSpe = sit.getSpecialites().indexOf(etud.getSpecialite());
-                if ( totPlaces[numOffre-1] > 0 && placesParSpe[numOffre-1][numSpe] > 0) {
+                if (totPlaces[numOffre] > 0 && placesParSpe[numOffre][numSpe] > 0) {
                     found = numOffre;
-                    totPlaces[numOffre-1] --;
-                    placesParSpe[numOffre-1][numSpe] --;
+                    totPlaces[numOffre]--;
+                    placesParSpe[numOffre][numSpe]--;
                 }
-                i ++;
+                i++;
             }
             if (found != -1) {
-                res.add(new Affectation(etud.getIne(), Optional.of(found)));
+               res.add(new AffectUnEtud(etud, Optional.of(refToIndexOffre.getObject(found))));
             } else {
-                res.add(new Affectation(etud.getIne(), Optional.empty()));
+                res.add(new AffectUnEtud(etud, Optional.empty()));
             }
         }
-        return res;
+        return new Affectation(sit, res);
     }
 
-    /**
-     * @return the ineEtud
-     */
-    public String getIneEtud() {
-        return ineEtud;
+    public static void test() {
+//        TestMobilite test = TestMobilite.tirage(Params.paramsPetit(), 2991);  // best : 2991
+        TestMobilite test = TestMobilite.tirage(GenereTests.paramsINSA(), 2991);  
+        System.out.println(test);
+        Affectation affect = Affectation.affecte(test);
+        System.out.println(affect.toStringAvecStat());
     }
 
-    /**
-     * @return the numOffre
-     */
-    public Optional<Integer> getNumOffre() {
-        return numOffre;
-    }
-    
-    public static void testPetit() {
-        TestMobilite petit = TestMobilite.tirage(Params.paramsPetit(), 12398);
-        System.out.println(petit);
-        List<Affectation> affect = affecte(petit);
-        System.out.println(affect.stream().map(Affectation::toString).collect(Collectors.joining("\n")));
-    }
-    
     public static void main(String[] args) {
-        testPetit();
+        test();
     }
 
-    
+    /**
+     * @return the affectationEtuds
+     */
+    public List<AffectUnEtud> getAffectationEtuds() {
+        return affectationEtuds;
+    }
+
 }

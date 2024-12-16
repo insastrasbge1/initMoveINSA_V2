@@ -44,7 +44,7 @@ public class TestMobilite {
     private List<OffreGen> offres;
     private List<EtudGen> etudiants;
 
-    public TestMobilite(Params params, long seed, List<String> specialites,List<String> partenaires, List<OffreGen> offres, List<EtudGen> etudiants) {
+    public TestMobilite(Params params, long seed, List<String> specialites, List<String> partenaires, List<OffreGen> offres, List<EtudGen> etudiants) {
         this.seed = seed;
         this.params = params;
         this.specialites = specialites;
@@ -55,13 +55,14 @@ public class TestMobilite {
 
     /**
      * tirage aléatoire d'une configuration de mobilite. Retournera le même
-     * recalculera le même résultat pour un même seed, et des résultats différents
-     * pour deux seed différents.
-     * Vous pouvez donner un seed de 0 pour tirer le seed au hasard à chaque appel
-     * (et donc avoir un résultat différent à chaque appel)
+     * recalculera le même résultat pour un même seed, et des résultats
+     * différents pour deux seed différents. Vous pouvez donner un seed de 0
+     * pour tirer le seed au hasard à chaque appel (et donc avoir un résultat
+     * différent à chaque appel)
      *
      * @param p les paramètres du problème
-     * @param seed pour initialiser le générateur aléatoire. Si zero seed tiré aléatoirement
+     * @param seed pour initialiser le générateur aléatoire. Si zero seed tiré
+     * aléatoirement
      * @return
      */
     public static TestMobilite tirage(Params p, long seed) {
@@ -77,7 +78,7 @@ public class TestMobilite {
         for (String curPar : partenaires) {
             int nbrOffres = TiragesAlea2.choixIndicePondere(p.getProbasNbrOffres(), r);
             for (int i = 0; i < nbrOffres; i++) {
-                offres.add(OffreGen.OffreAlea(numOffre, curPar, p, r));
+                offres.add(OffreGen.OffreAlea(p.getPrefixRefOffres() + String.format("%04d", numOffre), curPar, p, r));
                 numOffre++;
             }
         }
@@ -96,9 +97,8 @@ public class TestMobilite {
                 } else {
                     voeux = TiragesAlea2.choixAleaMultiple(possibles, nbrChoisi, r);
                 }
-                System.out.println("voeux : " + voeux);
                 Collections.shuffle(voeux, r);
-                List<Integer> numVoeux = voeux.stream().map(v -> v.getNumOffre()).toList();
+                List<String> numVoeux = voeux.stream().map(v -> v.getRefOffre()).toList();
                 etuds.add(new EtudGen(p.getPrefixINEEtudiant() + String.format("%04d", numEtud),
                         p.getPrefixNomEtudiant() + String.format("%04d", r.nextInt(p.getNombreDeNomDifferents()) + 1),
                         prenoms.get(r.nextInt(prenoms.size())),
@@ -108,7 +108,7 @@ public class TestMobilite {
                 numEtud++;
             }
         }
-        return new TestMobilite(p, seed,p.getSpecialites(), partenaires, offres, etuds);
+        return new TestMobilite(p, seed, p.getSpecialites(), partenaires, offres, etuds);
     }
 
     public void saveInCSV(File inDir, String prefixNomsFichiers) throws IOException {
@@ -175,6 +175,13 @@ Fichiers générés :
                 .replace("$PREFIX", prefixNomsFichiers);
         try (BufferedWriter outReadme = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_README.txt").toFile(), StandardCharset.UTF_8))) {
             outReadme.append(readme + "\n");
+        }
+        String affect = """
+affectation obtenue. (Donné à titre indicatif)
+""";
+        try (BufferedWriter outAffect = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_affectation.txt").toFile(), StandardCharset.UTF_8))) {
+            outAffect.append(affect + "\n");
+            outAffect.append(Affectation.affecte(this).toStringAvecStat());
         }
     }
 

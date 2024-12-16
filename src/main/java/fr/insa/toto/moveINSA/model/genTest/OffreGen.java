@@ -31,13 +31,13 @@ import java.util.stream.IntStream;
  */
 public class OffreGen {
     
-    private int numOffre;
+    private String refOffre;
     private String partenaire;
     private int totPlaces;
     private List<Integer> placesParSpe;
 
-    public OffreGen(int numOffre, String partenaire, int totPlaces, List<Integer> placesParSpe) {
-        this.numOffre = numOffre;
+    public OffreGen(String refOffre, String partenaire, int totPlaces, List<Integer> placesParSpe) {
+        this.refOffre = refOffre;
         this.partenaire = partenaire;
         this.totPlaces = totPlaces;
         this.placesParSpe = placesParSpe;
@@ -45,15 +45,17 @@ public class OffreGen {
 
     @Override
     public String toString() {
-        return "OffreGen{" + numOffre + " : " + partenaire + " tot=" + totPlaces + " parSpe=" + placesParSpe + '}';
+        return "OffreGen{" + refOffre + " : " + partenaire + " tot=" + totPlaces + " parSpe=" + placesParSpe + '}';
     }
 
-    public static OffreGen OffreAlea(int numOffre, String partenaire, Params p, Random r) {
+    public static OffreGen OffreAlea(String refOffre, String partenaire, Params p, Random r) {
         int totPlaces = TiragesAlea2.choixIndicePondere(p.getProbasTotPlaceParOffre(), r)+1;
         // deux cas particuliers, et un cas général
         double alea = r.nextDouble();
         int nbrSpe = p.getSpecialites().size();
         List<Integer> parSpe;
+        System.out.println("libres : " + p.getPercentOffresLibres());
+        System.out.println("contraintes : " + p.getPercentOffresContraintes());
         if (alea < p.getPercentOffresContraintes()) {
             // une offre telle que totPlace = somme(places offertes par spécialité)
             // System.out.println(" contrainte");
@@ -85,11 +87,11 @@ public class OffreGen {
                 parSpe.set(numSpe, parSpe.get(numSpe) + 1);
             }
         }
-        return new OffreGen(numOffre, partenaire, totPlaces, parSpe);
+        return new OffreGen(refOffre, partenaire, totPlaces, parSpe);
     }
 
     public String formatCSV() {
-        return this.placesParSpe.stream().map(n -> "" + n).collect(Collectors.joining(";", this.numOffre + ";" + this.partenaire + ";" + this.totPlaces + ";", ""));
+        return this.placesParSpe.stream().map(n -> "" + n).collect(Collectors.joining(";", this.refOffre + ";" + this.partenaire + ";" + this.totPlaces + ";", ""));
     }
 
     public static List<OffreGen> offresPossibles(List<OffreGen> toutes, int numSpe) {
@@ -118,10 +120,10 @@ public class OffreGen {
     }
 
     /**
-     * @return the numOffre
+     * @return the refOffre
      */
-    public int getNumOffre() {
-        return numOffre;
+    public String getRefOffre() {
+        return refOffre;
     }
     
 }

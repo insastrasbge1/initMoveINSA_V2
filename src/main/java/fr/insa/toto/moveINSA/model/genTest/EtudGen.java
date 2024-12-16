@@ -31,9 +31,9 @@ public class EtudGen {
     private String prenom;
     private String specialite;
     private double score;
-    private List<Integer> voeux;
+    private List<String> voeux;
 
-    public EtudGen(String ine, String nom, String prenom, String specialite,double score,List<Integer> voeux) {
+    public EtudGen(String ine, String nom, String prenom, String specialite,double score,List<String> voeux) {
         this.ine = ine;
         this.nom = nom;
         this.prenom = prenom;
@@ -85,7 +85,7 @@ public class EtudGen {
     /**
      * @return the voeux
      */
-    public List<Integer> getVoeux() {
+    public List<String> getVoeux() {
         return voeux;
     }
 

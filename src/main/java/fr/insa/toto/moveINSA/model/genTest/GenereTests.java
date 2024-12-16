@@ -94,17 +94,49 @@ import java.util.Random;
  * @author francois
  */
 public class GenereTests {
+    
+    public static String OUTPUT_DIR = "C:\\temp\\genMoveINSA";
 
-    public static void test1() {
-        try {
-            Params p = Params.paramsPetit();
-            TestMobilite t = TestMobilite.tirage(p, 0);
-            System.out.println(t);
-            t.saveInCSV(new File("C:\\temp\\genMoveINSA"), "t1");
-        } catch (IOException ex) {
-            throw new Error(ex);
-        }
+        public static Params paramsPetit() {
+        return new Params(
+                List.of("GC", "GE"), // specialites
+                List.of(2,2), // minEffectifsSpe
+                List.of(4,4), // maxEffectifsSpe
+                2, // minNbrPartenaires
+                2, // maxNbrPartenaires
+                List.of(0.0, 1.0), // probasNbrOffres
+                List.of(0.2,0.8), // probasTotPlaceParOffre
+                "O_", // prefixRefOffres
+                0.1, // percentOffresContraintes
+                0.7, // percentOffresLibres
+                "INE", // prefixINEEtudiant
+                "Toto", // prefixNomEtudiant
+                200, // nombreDeNomDifferents
+                List.of("Louis", "Noah", "Ava", "Mia"), // prenomsPossibles
+                List.of(0.0,0.2,0.8) // probasNbrVoeux
+        );
     }
+    
+    public static Params paramsINSA() {
+        return new Params(
+                List.of("GC", "G", "GE", "GT2E", "GM", "MIQ", "PL"), // specialites
+                List.of(100, 20, 40, 40, 60, 40, 20), // minEffectifsSpe
+                List.of(140, 60, 80, 80, 100, 80, 60), // maxEffectifsSpe
+                130, // minNbrPartenaires
+                160, // maxNbrPartenaires
+                List.of(0.05, 0.8, 0.1, 0.05), // probasNbrOffres
+                List.of(0.1, 0.1, 0.2, 0.2, 0.2, 0.1,0.1), // probasTotPlaceParOffre
+                "O_", // prefixRefOffres
+                0.33, // percentOffresContraintes
+                0.5, // percentOffresLibres
+                "INE", // prefixINEEtudiant
+                "Toto", // prefixNomEtudiant
+                200, // nombreDeNomDifferents
+                List.of("Louis", "Noah", "Ava", "Mia"), // prenomsPossibles
+                List.of(0.05, 0.1, 0.15, 0.3, 0.3, 0.1) // probasNbrVoeux
+        );
+    }
+
 
     /** calcule un exemple de mobilite avec des paramètres "proches" de l'INSA Strasbourg.
      * recalculera le même résultat pour un même seed, et des résultats différents
@@ -116,23 +148,22 @@ public class GenereTests {
      * @param seed si 0 tiré au hasard à chaque appel
      * @throws IOException 
      */
-    public static void genereSimuINSA(File outputDir,long seed) throws IOException {
-        Params p = Params.paramsINSA();
+    public static void genereSimu(Params p,File outputDir,String prefixFichiers,long seed) throws IOException {
         TestMobilite t = TestMobilite.tirage(p, seed);
         System.out.println(t);
-        t.saveInCSV(outputDir, "simuINSA");
+        t.saveInCSV(outputDir, prefixFichiers);
     }
 
     public static void main(String[] args) {
-                test1();
-//        try {
-//            // on fixe le seed pour obtenir toujours le résultat fourni
-//            // vous pouvez enlever le seed si vous voulez tester différents
-//            // résultats
-//            genereSimuINSA(new File("C:\\temp\\genMoveINSA"),5644684);
-//        } catch (IOException ex) {
-//            throw new Error(ex);
-//        }
+        try {
+            // on fixe les seed pour obtenir toujours le résultat fourni
+            // vous pouvez mettre le siid à zéro si vous voulez tester différents
+            // résultats
+            genereSimu(paramsPetit(),new File("C:\\temp\\genMoveINSA"),"simuPetit",2991);
+            genereSimu(paramsINSA(),new File("C:\\temp\\genMoveINSA"),"simuINSA",5644684);
+        } catch (IOException ex) {
+            throw new Error(ex);
+        }
     }
 
 }
