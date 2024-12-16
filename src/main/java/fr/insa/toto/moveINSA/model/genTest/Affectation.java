@@ -76,6 +76,44 @@ public class Affectation {
         return res;
     }
 
+    /** affecte les étudiants en fonction de leur score et de leurs voeux.
+     * <pre>
+     * Algo simplifié :
+     * <ul>
+     *   <li> soit 
+     *   <ul>
+     *     <li> nbrSpe : le nombre de spécialité </li>
+     *     <li> nbrOffre : le nombre d'offres </li>
+     *   </ul>
+     *   <li> on numérote les offres : 0 .. nbrOffre-1 </li>
+     *   <li> on calcule le tableau totPlace[o] = nombre total de places pour l'offre N°o </li>
+     *   <li> on calcule la matrice placesParSpe[o][s] = nombre de places pour l'offre N°o pour la spécialité s </li>
+     *   <li> on trie les étudiants par score décroissant </li>
+     *   <li> pour chaque étudiant etud </li>
+     *   <ul>
+     *     <li> spe : la spécialité de l'étudiant </li>
+     *     <li> listeVoeux : la liste des offres choisies par l'étudiant (par ordre de préférence) </li>
+     *     <li> on cherche dans listeVoeux la première offre o telle que  </li>
+     *     <ul>
+     *       <li> totPlace[o] > 0 </li>
+     *       <li> placesParSpe[o][spe] > 0 </li>
+     *     </ul>
+     *     <li> si l'on a trouvé telle offre oOK  </li>
+     *     <ul>
+     *       <li> etud obtient oOK  </li>
+     *       <li> on décrémente totPlace[oOK]  </li>
+     *       <li> on décrémente placesParSpe[oOK][spe] > 0 </li>
+     *     </ul>
+     *     <li> sinon  </li>
+     *     <ul>
+     *       <li> etud n'obtient aucune affectation </li>
+     *     </ul>
+     *   </ul>
+     * </ul>
+     * </pre>
+     * @param sit
+     * @return 
+     */
     public static Affectation affecte(TestMobilite sit) {
         // je construit d'abord des tableaux correspondant aux places libres dans les offres
         int nbrOffre = sit.getOffres().size();
