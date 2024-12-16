@@ -159,8 +159,8 @@ public class GenereTests {
             // on fixe les seed pour obtenir toujours le résultat fourni
             // vous pouvez mettre le siid à zéro si vous voulez tester différents
             // résultats
-            genereSimu(paramsPetit(),new File("C:\\temp\\genMoveINSA"),"simuPetit",2991);
-            genereSimu(paramsINSA(),new File("C:\\temp\\genMoveINSA"),"simuINSA",5644684);
+            genereSimu(paramsPetit(),new File(OUTPUT_DIR),"simuPetit",2991);
+            genereSimu(paramsINSA(),new File(OUTPUT_DIR),"simuINSA",5644684);
         } catch (IOException ex) {
             throw new Error(ex);
         }
