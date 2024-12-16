@@ -62,6 +62,7 @@ public class GestionBdD {
             st.executeUpdate(
                     "create table offremobilite ( \n"
                     + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ",\n"
+                    + " ref varchar(20) not null unique,\n"
                     + " nbrplaces int not null,\n"
                     + " proposepar int not null\n"
                     + ")");
@@ -113,6 +114,10 @@ public class GestionBdD {
                 st.executeUpdate("drop table partenaire");
             } catch (SQLException ex) {
             }
+            try {
+                st.executeUpdate("drop table etudiant");
+            } catch (SQLException ex) {
+            }
         }
     }
 
@@ -131,9 +136,9 @@ public class GestionBdD {
             p.saveInDB(con);
         }
         List<OffreMobilite> offres = List.of(
-                new OffreMobilite(1, partenaires.get(0).getId()),
-                new OffreMobilite(2, partenaires.get(0).getId()),
-                new OffreMobilite(5, partenaires.get(1).getId())
+                new OffreMobilite("o1",1,partenaires.get(0).getId()),
+                new OffreMobilite("o2",2, partenaires.get(0).getId()),
+                new OffreMobilite("o3",5, partenaires.get(1).getId())
         );
         for (var o : offres) {
             o.saveInDB(con);

@@ -20,6 +20,8 @@ package fr.insa.toto.moveINSA.model;
 
 import fr.insa.beuvron.utils.ConsoleFdB;
 import fr.insa.beuvron.utils.list.ListUtils;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -119,6 +121,16 @@ public class Partenaire implements Serializable{
                 rid.next();
                 this.id = rid.getInt(1);
                 return this.getId();
+            }
+        }
+    }
+    
+    public static void createFromCSV(Connection con,BufferedReader bin) throws IOException, SQLException {
+        String line;
+        while ((line = bin.readLine()) != null) {
+            if (! line.trim().isEmpty()) {
+                Partenaire p = new Partenaire(line);
+                p.saveInDB(con);
             }
         }
     }

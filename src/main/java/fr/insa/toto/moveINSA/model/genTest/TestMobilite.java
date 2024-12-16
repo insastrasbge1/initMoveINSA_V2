@@ -112,25 +112,25 @@ public class TestMobilite {
     }
 
     public void saveInCSV(File inDir, String prefixNomsFichiers) throws IOException {
-        try (BufferedWriter outPart = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_specialites.txt").toFile(), StandardCharset.UTF_8))) {
+        try (BufferedWriter outPart = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_specialites.csv").toFile(), StandardCharset.UTF_8))) {
             outPart.append(this.params.getSpecialites().stream().collect(Collectors.joining(";")) + "\n");
         }
-        try (BufferedWriter outPart = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_partenaires.txt").toFile(), StandardCharset.UTF_8))) {
+        try (BufferedWriter outPart = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_partenaires.csv").toFile(), StandardCharset.UTF_8))) {
             for (String part : this.partenaires) {
                 outPart.append(part + "\n");
             }
         }
-        try (BufferedWriter outOffres = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_offres.txt").toFile(), StandardCharset.UTF_8))) {
+        try (BufferedWriter outOffres = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_offres.csv").toFile(), StandardCharset.UTF_8))) {
             for (OffreGen offre : this.offres) {
                 outOffres.append(offre.formatCSV() + "\n");
             }
         }
-        try (BufferedWriter outEtuds = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_etudiants.txt").toFile(), StandardCharset.UTF_8))) {
+        try (BufferedWriter outEtuds = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_etudiants.csv").toFile(), StandardCharset.UTF_8))) {
             for (EtudGen etud : this.etudiants) {
                 outEtuds.append(etud.formatCSV() + "\n");
             }
         }
-        try (BufferedWriter outVoeux = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_voeux.txt").toFile(), StandardCharset.UTF_8))) {
+        try (BufferedWriter outVoeux = new BufferedWriter(new FileWriter(inDir.toPath().resolve(prefixNomsFichiers + "_voeux.csv").toFile(), StandardCharset.UTF_8))) {
             for (int curEtud = 0; curEtud < this.etudiants.size(); curEtud++) {
                 String ine = this.etudiants.get(curEtud).getIne();
                 String voeux = this.etudiants.get(curEtud).getVoeux().stream()

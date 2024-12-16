@@ -33,6 +33,8 @@ import fr.insa.toto.moveINSA.gui.vues.OffresPanel;
 import fr.insa.toto.moveINSA.gui.vues.PartenairesPanel;
 import fr.insa.toto.moveINSA.gui.vues.RAZBdDPanel;
 import fr.insa.toto.moveINSA.gui.vues.TestDriverPanel;
+import fr.insa.toto.moveINSA.gui.vues.UploadOffres;
+import fr.insa.toto.moveINSA.gui.vues.UploadPartenaires;
 
 /**
  *
@@ -45,9 +47,11 @@ public class MenuGauche extends SideNav {
         SideNavItem partenaires = new SideNavItem("partenaires");
         partenaires.addItem(new SideNavItem("liste", PartenairesPanel.class));
         partenaires.addItem(new SideNavItem("nouveau", NouveauPartenairePanel.class));
+        partenaires.addItem(new SideNavItem("upload", UploadPartenaires.class));
         SideNavItem offres = new SideNavItem("offres");
         offres.addItem(new SideNavItem("liste", OffresPanel.class));
         offres.addItem(new SideNavItem("nouvelle", NouvelleOffrePanel.class));
+        offres.addItem(new SideNavItem("upload", UploadOffres.class));
         SideNavItem debug = new SideNavItem("debug");
         debug.addItem(new SideNavItem("test driver", TestDriverPanel.class));
         debug.addItem(new SideNavItem("raz BdD", RAZBdDPanel.class));

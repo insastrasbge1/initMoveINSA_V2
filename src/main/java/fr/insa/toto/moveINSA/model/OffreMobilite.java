@@ -19,12 +19,15 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
 package fr.insa.toto.moveINSA.model;
 
 import fr.insa.beuvron.utils.ConsoleFdB;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Classe "miroir" de la table offremobilite.
@@ -37,7 +40,8 @@ import java.util.List;
  */
 public class OffreMobilite {
 
-    private int id;
+   private int id;
+    private String ref;
     private int nbrPlaces;
     private int proposePar;
 
@@ -45,22 +49,23 @@ public class OffreMobilite {
      * création d'une nouvelle Offre en mémoire, non existant dans la Base de
      * donnée.
      */
-    public OffreMobilite(int nbrPlaces, int proposePar) {
-        this(-1, nbrPlaces, proposePar);
+    public OffreMobilite(String ref,int nbrPlaces, int proposePar) {
+        this(-1, ref,nbrPlaces, proposePar);
     }
 
     /**
      * création d'une Offre retrouvée dans la base de donnée.
      */
-    public OffreMobilite(int id, int nbrPlaces, int proposePar) {
+    public OffreMobilite(int id,String ref, int nbrPlaces, int proposePar) {
         this.id = id;
+        this.ref = ref;
         this.nbrPlaces = nbrPlaces;
         this.proposePar = proposePar;
     }
 
     @Override
     public String toString() {
-        return "OffreMobilite{" + "id=" + this.getId() + " ; nbrPlaces=" + nbrPlaces + " ; proposePar=" + proposePar + '}';
+        return "OffreMobilite{" + "id=" + this.getId() + " ; ref=" + ref+ " ; nbrPlaces=" + nbrPlaces + " ; proposePar=" + proposePar + '}';
     }
 
     /**
@@ -80,10 +85,11 @@ public class OffreMobilite {
             throw new fr.insa.toto.moveINSA.model.EntiteDejaSauvegardee();
         }
         try (PreparedStatement insert = con.prepareStatement(
-                "insert into offremobilite (nbrplaces,proposepar) values (?,?)",
+                "insert into offremobilite (ref,nbrplaces,proposepar) values (?,?,?)",
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
-            insert.setInt(1, this.nbrPlaces);
-            insert.setInt(2, this.proposePar);
+            insert.setString(1, ref);
+            insert.setInt(2, this.nbrPlaces);
+            insert.setInt(3, this.proposePar);
             insert.executeUpdate();
             try (ResultSet rid = insert.getGeneratedKeys()) {
                 rid.next();
@@ -93,13 +99,46 @@ public class OffreMobilite {
         }
     }
 
-    public static List<OffreMobilite> toutesLesOffres(Connection con) throws SQLException {
+    public static class InvalidOffreException extends IOException {
+        public InvalidOffreException(int numLigne,String message) {
+            super("offre invalide en ligne" + numLigne + " : " + message);
+        }
+    }
+    public static void createFromCSV(Connection con, BufferedReader bin) throws IOException, SQLException {
+       String line;
+       int numLigne = 1;
+       try {
+        while ((line = bin.readLine()) != null) {
+            if (! line.trim().isEmpty()) {
+                String[] decompose = line.split(";");
+                String refPartenaire = decompose[1];
+                Optional<Partenaire> part = Partenaire.trouvePartaire(con, refPartenaire);
+                if (part.isEmpty()) {
+                    throw new InvalidOffreException(numLigne,"partenaire " + refPartenaire + " inconnu");
+                }
+                // les places par spécialité sont ignorées puisqu'elles n'existent pas dans ce modèle simplifié
+                OffreMobilite o = new OffreMobilite(decompose[0],Integer.parseInt(decompose[2]), part.get().getId());
+                o.saveInDB(con);
+            }
+        }
+       } 
+       // on laisse passer les exceptions déjà prévues
+       catch (IOException | SQLException ex) {
+           throw ex;
+       } 
+       // on gère les autres exceptions : du genre il n'y a pas assez de ; sur la ligne
+       catch (Exception ex) {
+           throw new InvalidOffreException(numLigne, ex.getLocalizedMessage());
+       }
+    }
+
+     public static List<OffreMobilite> toutesLesOffres(Connection con) throws SQLException {
         try (PreparedStatement pst = con.prepareStatement(
-                "select id,nbrplaces,proposepar from offremobilite")) {
+                "select id,ref,nbrplaces,proposepar from offremobilite")) {
             ResultSet rs = pst.executeQuery();
             List<OffreMobilite> res = new ArrayList<>();
             while (rs.next()) {
-                res.add(new OffreMobilite(rs.getInt(1), rs.getInt(2), rs.getInt(3)));
+                res.add(new OffreMobilite(rs.getInt(1), rs.getString(2),rs.getInt(3), rs.getInt(4)));
             }
             return res;
         }
@@ -107,8 +146,9 @@ public class OffreMobilite {
 
     public static int creeConsole(Connection con) throws SQLException {
         Partenaire p = Partenaire.selectInConsole(con);
+        String ref = ConsoleFdB.entreeString("ref de l'offre");
         int nbr = ConsoleFdB.entreeInt("nombre de places : ");
-        OffreMobilite nouveau = new OffreMobilite(nbr, p.getId());
+        OffreMobilite nouveau = new OffreMobilite(ref,nbr, p.getId());
         return nouveau.saveInDB(con);
     }
 

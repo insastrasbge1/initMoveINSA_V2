@@ -22,6 +22,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.vaadin.utils.ConnectionPool;
 import fr.insa.toto.moveINSA.gui.MainLayout;
@@ -40,11 +41,13 @@ import java.util.logging.Logger;
 public class NouvelleOffrePanel extends VerticalLayout {
 
     private ChoixPartenaireCombo cbPartenaire;
+    private TextField tfRef;
     private IntegerField ifPlaces;
     private Button bSave;
 
     public NouvelleOffrePanel() {
         this.cbPartenaire = new ChoixPartenaireCombo();
+        this.tfRef = new TextField("référence de l'offre");
         this.ifPlaces = new IntegerField("nombre de places");
         this.bSave = new Button("Save");
         this.bSave.addClickListener((t) -> {
@@ -57,7 +60,7 @@ public class NouvelleOffrePanel extends VerticalLayout {
                     Notification.show("vous devez préciser un nombre de places valide");
                 } else {
                     int partId = selected.getId();
-                    OffreMobilite nouvelle = new OffreMobilite(places, partId);
+                    OffreMobilite nouvelle = new OffreMobilite(this.tfRef.getValue(),places, partId);
                     try (Connection con = ConnectionPool.getConnection()) {
                         nouvelle.saveInDB(con);
                         Notification.show("Nouvelle offre enregistrée");
