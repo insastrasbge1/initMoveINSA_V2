@@ -72,7 +72,7 @@ public class TestMobilite {
         Random r = new Random(seed);
         // tirage des partenaires
         int nbrPart = r.nextInt(p.getMinNbrPartenaires(), p.getMaxNbrPartenaires() + 1);
-        List<String> partenaires = IntStream.range(1, nbrPart + 1).boxed().map(i -> "Univ" + String.format("%03d", i)).toList();
+        List<String> partenaires = IntStream.range(1, nbrPart + 1).boxed().map(i -> p.getPrefixPartenaires() + String.format("%03d", i)).toList();
         List<OffreGen> offres = new ArrayList<>();
         int numOffre = 1;
         for (String curPar : partenaires) {

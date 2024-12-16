@@ -58,7 +58,7 @@ import java.util.Optional;
  *
  * @author francois
  */
-public class Partenaire implements Serializable{
+public class Partenaire implements Serializable {
 
     /**
      * permet de tester lors du chargement d'un objet sérialisé que la version
@@ -67,7 +67,7 @@ public class Partenaire implements Serializable{
      * </pre>
      */
     private static final long serialVersionUID = 1;
-    
+
     private int id;
     private String refPartenaire;
 
@@ -78,7 +78,7 @@ public class Partenaire implements Serializable{
      * @param refPartenaire
      */
     public Partenaire(String refPartenaire) {
-        this(-1,refPartenaire);
+        this(-1, refPartenaire);
     }
 
     /**
@@ -124,14 +124,25 @@ public class Partenaire implements Serializable{
             }
         }
     }
-    
-    public static void createFromCSV(Connection con,BufferedReader bin) throws IOException, SQLException {
-        String line;
-        while ((line = bin.readLine()) != null) {
-            if (! line.trim().isEmpty()) {
-                Partenaire p = new Partenaire(line);
-                p.saveInDB(con);
+
+    public static void createFromCSV(Connection con, BufferedReader bin) throws IOException, SQLException {
+        // on veut du tout ou rien : soit le fichier est correctement analysé en entier
+        // soit on ne modifie pas du tout la BdD ==> transaction
+        try {
+            con.setAutoCommit(false);
+            String line;
+            while ((line = bin.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    Partenaire p = new Partenaire(line);
+                    p.saveInDB(con);
+                }
             }
+            con.commit();
+        } catch (Exception ex) {
+            con.rollback();
+            throw ex;
+        } finally {
+            con.setAutoCommit(true);
         }
     }
 

@@ -40,7 +40,7 @@ import java.util.Optional;
  */
 public class OffreMobilite {
 
-   private int id;
+    private int id;
     private String ref;
     private int nbrPlaces;
     private int proposePar;
@@ -49,14 +49,14 @@ public class OffreMobilite {
      * création d'une nouvelle Offre en mémoire, non existant dans la Base de
      * donnée.
      */
-    public OffreMobilite(String ref,int nbrPlaces, int proposePar) {
-        this(-1, ref,nbrPlaces, proposePar);
+    public OffreMobilite(String ref, int nbrPlaces, int proposePar) {
+        this(-1, ref, nbrPlaces, proposePar);
     }
 
     /**
      * création d'une Offre retrouvée dans la base de donnée.
      */
-    public OffreMobilite(int id,String ref, int nbrPlaces, int proposePar) {
+    public OffreMobilite(int id, String ref, int nbrPlaces, int proposePar) {
         this.id = id;
         this.ref = ref;
         this.nbrPlaces = nbrPlaces;
@@ -65,7 +65,7 @@ public class OffreMobilite {
 
     @Override
     public String toString() {
-        return "OffreMobilite{" + "id=" + this.getId() + " ; ref=" + ref+ " ; nbrPlaces=" + nbrPlaces + " ; proposePar=" + proposePar + '}';
+        return "OffreMobilite{" + "id=" + this.getId() + " ; ref=" + ref + " ; nbrPlaces=" + nbrPlaces + " ; proposePar=" + proposePar + '}';
     }
 
     /**
@@ -100,45 +100,53 @@ public class OffreMobilite {
     }
 
     public static class InvalidOffreException extends IOException {
-        public InvalidOffreException(int numLigne,String message) {
+
+        public InvalidOffreException(int numLigne, String message) {
             super("offre invalide en ligne" + numLigne + " : " + message);
         }
     }
+
     public static void createFromCSV(Connection con, BufferedReader bin) throws IOException, SQLException {
-       String line;
-       int numLigne = 1;
-       try {
-        while ((line = bin.readLine()) != null) {
-            if (! line.trim().isEmpty()) {
-                String[] decompose = line.split(";");
-                String refPartenaire = decompose[1];
-                Optional<Partenaire> part = Partenaire.trouvePartaire(con, refPartenaire);
-                if (part.isEmpty()) {
-                    throw new InvalidOffreException(numLigne,"partenaire " + refPartenaire + " inconnu");
+        String line;
+        int numLigne = 1;
+        try {
+            con.setAutoCommit(false);
+            while ((line = bin.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    String[] decompose = line.split(";");
+                    String refPartenaire = decompose[1];
+                    Optional<Partenaire> part = Partenaire.trouvePartaire(con, refPartenaire);
+                    if (part.isEmpty()) {
+                        throw new InvalidOffreException(numLigne, "partenaire " + refPartenaire + " inconnu");
+                    }
+                    // les places par spécialité sont ignorées puisqu'elles n'existent pas dans ce modèle simplifié
+                    OffreMobilite o = new OffreMobilite(decompose[0], Integer.parseInt(decompose[2]), part.get().getId());
+                    o.saveInDB(con);
                 }
-                // les places par spécialité sont ignorées puisqu'elles n'existent pas dans ce modèle simplifié
-                OffreMobilite o = new OffreMobilite(decompose[0],Integer.parseInt(decompose[2]), part.get().getId());
-                o.saveInDB(con);
+                numLigne++;
             }
+            con.commit();
+        } // on laisse passer les exceptions déjà prévues
+        catch (IOException | SQLException ex) {
+            con.rollback();
+            throw ex;
+        } // on gère les autres exceptions : du genre il n'y a pas assez de ; sur la ligne
+        catch (Exception ex) {
+            con.rollback();
+            throw new InvalidOffreException(numLigne, ex.getLocalizedMessage());
         }
-       } 
-       // on laisse passer les exceptions déjà prévues
-       catch (IOException | SQLException ex) {
-           throw ex;
-       } 
-       // on gère les autres exceptions : du genre il n'y a pas assez de ; sur la ligne
-       catch (Exception ex) {
-           throw new InvalidOffreException(numLigne, ex.getLocalizedMessage());
-       }
+        finally {
+            con.setAutoCommit(true);
+        }
     }
 
-     public static List<OffreMobilite> toutesLesOffres(Connection con) throws SQLException {
+    public static List<OffreMobilite> toutesLesOffres(Connection con) throws SQLException {
         try (PreparedStatement pst = con.prepareStatement(
                 "select id,ref,nbrplaces,proposepar from offremobilite")) {
             ResultSet rs = pst.executeQuery();
             List<OffreMobilite> res = new ArrayList<>();
             while (rs.next()) {
-                res.add(new OffreMobilite(rs.getInt(1), rs.getString(2),rs.getInt(3), rs.getInt(4)));
+                res.add(new OffreMobilite(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4)));
             }
             return res;
         }
@@ -148,7 +156,7 @@ public class OffreMobilite {
         Partenaire p = Partenaire.selectInConsole(con);
         String ref = ConsoleFdB.entreeString("ref de l'offre");
         int nbr = ConsoleFdB.entreeInt("nombre de places : ");
-        OffreMobilite nouveau = new OffreMobilite(ref,nbr, p.getId());
+        OffreMobilite nouveau = new OffreMobilite(ref, nbr, p.getId());
         return nouveau.saveInDB(con);
     }
 

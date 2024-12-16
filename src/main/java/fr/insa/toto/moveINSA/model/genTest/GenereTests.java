@@ -102,14 +102,15 @@ public class GenereTests {
                 List.of("GC", "GE"), // specialites
                 List.of(2,2), // minEffectifsSpe
                 List.of(4,4), // maxEffectifsSpe
+                "Ppetit_", // prefixPartenaire
                 2, // minNbrPartenaires
                 2, // maxNbrPartenaires
                 List.of(0.0, 1.0), // probasNbrOffres
                 List.of(0.2,0.8), // probasTotPlaceParOffre
-                "O_", // prefixRefOffres
+                "OPetit_", // prefixRefOffres
                 0.1, // percentOffresContraintes
                 0.7, // percentOffresLibres
-                "INE", // prefixINEEtudiant
+                "INEPetit", // prefixINEEtudiant
                 "Toto", // prefixNomEtudiant
                 200, // nombreDeNomDifferents
                 List.of("Louis", "Noah", "Ava", "Mia"), // prenomsPossibles
@@ -122,6 +123,7 @@ public class GenereTests {
                 List.of("GC", "G", "GE", "GT2E", "GM", "MIQ", "PL"), // specialites
                 List.of(100, 20, 40, 40, 60, 40, 20), // minEffectifsSpe
                 List.of(140, 60, 80, 80, 100, 80, 60), // maxEffectifsSpe
+                "PINSA_", //prefixPartenaire
                 130, // minNbrPartenaires
                 160, // maxNbrPartenaires
                 List.of(0.05, 0.8, 0.1, 0.05), // probasNbrOffres

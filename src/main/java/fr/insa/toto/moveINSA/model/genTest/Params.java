@@ -43,6 +43,10 @@ public class Params {
      */
     private List<Integer> maxEffectifsSpe;
     /**
+     * prefix sur le nom les refs des partenaires.
+     */
+    private String prefixPartenaires;
+    /**
      * le nombre minimum de partenaires . le nombre effectif sera tiré
      * aléatoirement entre min (inclu) et max (inclu)
      */
@@ -137,6 +141,7 @@ public class Params {
     private List<Double> probasNbrVoeux;
 
     public Params(List<String> specialites, List<Integer> minEffectifsSpe, List<Integer> maxEffectifsSpe,
+            String prefixPartenaire,
             int minNbrPartenaires, int maxNbrPartenaires,
             List<Double> probasNbrOffres,
             List<Double> probasTotPlaceParOffre,
@@ -148,6 +153,7 @@ public class Params {
         this.specialites = specialites;
         this.minEffectifsSpe = minEffectifsSpe;
         this.maxEffectifsSpe = maxEffectifsSpe;
+        this.prefixPartenaires = prefixPartenaire;
         this.minNbrPartenaires = minNbrPartenaires;
         this.maxNbrPartenaires = maxNbrPartenaires;
         this.probasNbrOffres = probasNbrOffres;
@@ -387,6 +393,20 @@ public class Params {
      */
     public void setPrefixRefOffres(String prefixRefOffres) {
         this.prefixRefOffres = prefixRefOffres;
+    }
+
+    /**
+     * @return the prefixPartenaires
+     */
+    public String getPrefixPartenaires() {
+        return prefixPartenaires;
+    }
+
+    /**
+     * @param prefixPartenaires the prefixPartenaires to set
+     */
+    public void setPrefixPartenaires(String prefixPartenaires) {
+        this.prefixPartenaires = prefixPartenaires;
     }
 
 }
