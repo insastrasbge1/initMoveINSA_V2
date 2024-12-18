@@ -51,7 +51,7 @@ public class EtudGen {
     }
 
     public String formatCSV() {
-        return ine + ";" + nom + ";" + prenom + ";" + specialite;
+        return ine + ";" + nom + ";" + prenom + ";" + specialite+ ";" + score;
     }
 
     /**
